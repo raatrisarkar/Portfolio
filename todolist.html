@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced To-Do List</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #FF7E5F, #FEB47B);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            width: 400px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            text-align: center;
+        }
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        input, button {
+            padding: 12px;
+            font-size: 18px;
+            margin: 10px 0;
+            width: 80%;
+            border-radius: 10px;
+            border: 2px solid #FF7E5F;
+            outline: none;
+        }
+        input:focus {
+            border-color: #FEB47B;
+        }
+        button {
+            background-color: #FF7E5F;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #FEB47B;
+        }
+        button:active {
+            background-color: #FF6B6B;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .delete {
+            background-color: #FF6B6B;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 50%;
+            padding: 8px 12px;
+            margin-left: 10px;
+            font-size: 14px;
+        }
+        .delete:hover {
+            background-color: #FF4747;
+        }
+        .strike {
+            text-decoration: line-through;
+            color: grey;
+        }
+        .timer, .clock {
+            margin: 10px;
+            font-size: 24px;
+        }
+        .custom-timer {
+            margin-top: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>To-Do List</h1>
+    <input type="text" id="todoInput" placeholder="Enter a task" />
+    <button onclick="addTask()">Add Task</button>
+    <ul id="todoList"></ul>
+
+    <div class="custom-timer">
+        Set Timer (seconds): <input type="number" id="customTime" placeholder="Set time in seconds" />
+        <button onclick="startCustomTimer()">Start Custom Timer</button>
+    </div>
+    <div class="timer">Timer: <span id="timerDisplay">00:00</span></div>
+    <div class="stopwatch">
+        Stopwatch: <span id="stopwatchDisplay">00:00</span>
+        <button onclick="startStopwatch()">Start</button>
+        <button onclick="stopStopwatch()">Stop</button>
+        <button onclick="resetStopwatch()">Reset</button>
+    </div>
+    <div class="clock" id="clockDisplay"></div>
+</div>
+
+<script>
+    // Timer functionality
+    let timerInterval;
+    let timerSeconds = 0;
+    const timerDisplay = document.getElementById("timerDisplay");
+
+    function updateTimer() {
+        timerSeconds++;
+        const minutes = Math.floor(timerSeconds / 60);
+        const seconds = timerSeconds % 60;
+        timerDisplay.textContent = `${formatTime(minutes)}:${formatTime(seconds)}`;
+    }
+
+    function startCustomTimer() {
+        const customTime = document.getElementById("customTime").value;
+        if (customTime <= 0) return;
+
+        timerSeconds = 0;
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            timerSeconds++;
+            if (timerSeconds >= customTime) {
+                clearInterval(timerInterval);
+            }
+            updateTimer();
+        }, 1000);
+    }
+
+    // Stopwatch functionality
+    let stopwatchInterval;
+    let stopwatchSeconds = 0;
+    const stopwatchDisplay = document.getElementById("stopwatchDisplay");
+
+    function updateStopwatch() {
+        stopwatchSeconds++;
+        const minutes = Math.floor(stopwatchSeconds / 60);
+        const seconds = stopwatchSeconds % 60;
+        stopwatchDisplay.textContent = `${formatTime(minutes)}:${formatTime(seconds)}`;
+    }
+
+    function startStopwatch() {
+        if (!stopwatchInterval) {
+            stopwatchInterval = setInterval(updateStopwatch, 1000);
+        }
+    }
+
+    function stopStopwatch() {
+        clearInterval(stopwatchInterval);
+        stopwatchInterval = null;
+    }
+
+    function resetStopwatch() {
+        stopwatchSeconds = 0;
+        stopwatchDisplay.textContent = "00:00";
+    }
+
+    // Clock functionality
+    function updateClock() {
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        const seconds = now.getSeconds();
+        const clockDisplay = document.getElementById("clockDisplay");
+        clockDisplay.textContent = `${formatTime(hours)}:${formatTime(minutes)}:${formatTime(seconds)}`;
+    }
+
+    setInterval(updateClock, 1000);
+
+    // Utility function to format time
+    function formatTime(time) {
+        return time < 10 ? `0${time}` : time;
+    }
+
+    // To-Do List functionality
+    function addTask() {
+        const taskInput = document.getElementById("todoInput");
+        const taskText = taskInput.value.trim();
+
+        if (taskText === "") return;
+
+        const li = document.createElement("li");
+        li.innerHTML = `${taskText} <button class="delete" onclick="removeTask(this)">❌</button>`;
+        li.onclick = function () {
+            li.classList.toggle("strike");
+        };
+        document.getElementById("todoList").appendChild(li);
+
+        taskInput.value = ""; // Clear input field
+    }
+
+    function removeTask(button) {
+        const li = button.parentElement;
+        li.remove();
+    }
+
+    // Initialize Timer
+    startCustomTimer();
+</script>
+
+</body>
+</html>

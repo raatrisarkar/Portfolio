@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Whiteboard</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #FFDEE9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        canvas {
+            background-color: #fff;
+            border: 2px solid #333;
+            cursor: crosshair;
+            border-radius: 15px;
+        }
+        #tools {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            background: #4CAF50;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.2);
+        }
+        button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            background-color: #76d7c4;
+            border: none;
+        }
+        button:hover {
+            background-color: #58d68d;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="whiteboard" width="800" height="600"></canvas>
+<div id="tools">
+    <button onclick="clearBoard()">Clear</button>
+    <button onclick="changeColor('#000000')">Black</button>
+    <button onclick="changeColor('#ff0000')">Red</button>
+    <button onclick="changeColor('#00ff00')">Green</button>
+    <button onclick="changeColor('#0000ff')">Blue</button>
+    <button onclick="changeSize(5)">Small</button>
+    <button onclick="changeSize(10)">Medium</button>
+    <button onclick="changeSize(20)">Large</button>
+</div>
+
+<script>
+    const canvas = document.getElementById("whiteboard");
+    const ctx = canvas.getContext("2d");
+
+    let drawing = false;
+    let color = '#000000';
+    let size = 5;
+    let lastX, lastY;
+
+    canvas.addEventListener("mousedown", startDrawing);
+    canvas.addEventListener("mousemove", draw);
+    canvas.addEventListener("mouseup", stopDrawing);
+    canvas.addEventListener("mouseout", stopDrawing);
+
+    function startDrawing(e) {
+        drawing = true;
+        lastX = e.offsetX;
+        lastY = e.offsetY;
+    }
+
+    function draw(e) {
+        if (!drawing) return;
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.lineWidth = size;
+        ctx.strokeStyle = color;
+        ctx.stroke();
+        lastX = e.offsetX;
+        lastY = e.offsetY;
+    }
+
+    function stopDrawing() {
+        drawing = false;
+    }
+
+    function clearBoard() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function changeColor(newColor) {
+        color = newColor;
+    }
+
+    function changeSize(newSize) {
+        size = newSize;
+    }
+</script>
+
+</body>
+</html>

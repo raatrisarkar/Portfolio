@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aesthetic Calculator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #8360c3, #2ebf91);
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+        }
+
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 12s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(30px);
+            }
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            animation: moveParticles 5s infinite ease-in-out;
+        }
+
+        @keyframes moveParticles {
+            0% {
+                transform: scale(0.5) translateY(0);
+            }
+            50% {
+                transform: scale(1.2) translateY(30px);
+            }
+            100% {
+                transform: scale(0.5) translateY(0);
+            }
+        }
+
+        .calculator {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            width: 300px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .calculator:hover {
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3), 0 0 20px rgba(131, 96, 195, 0.6);
+        }
+
+        .display {
+            width: 100%;
+            height: 60px;
+            font-size: 24px;
+            text-align: right;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
+            background: #f3f3f3;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .button {
+            height: 60px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .button.number {
+            background: #ffffff;
+            color: #333;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .button.operator {
+            background: #2ebf91;
+            color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .button.equal {
+            background: #8360c3;
+            color: #ffffff;
+            grid-column: span 2;
+        }
+
+        .button.clear {
+            background: #ff5e5e;
+            color: #ffffff;
+            grid-column: span 2;
+        }
+
+        .button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 10px rgba(0, 0, 0, 0.2), 0 0 10px rgba(131, 96, 195, 0.6);
+            animation: buttonHover 0.3s ease-in-out;
+        }
+
+        .button:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .button.number:active {
+            animation: scaleUp 0.2s ease-in-out;
+        }
+
+        .button.operator:active {
+            animation: scaleUp 0.2s ease-in-out;
+        }
+
+        @keyframes buttonHover {
+            0% { box-shadow: 0 8px 10px rgba(0, 0, 0, 0.2), 0 0 10px rgba(131, 96, 195, 0.6); }
+            50% { box-shadow: 0 12px 15px rgba(0, 0, 0, 0.3), 0 0 15px rgba(131, 96, 195, 0.8); }
+            100% { box-shadow: 0 8px 10px rgba(0, 0, 0, 0.2), 0 0 10px rgba(131, 96, 195, 0.6); }
+        }
+
+        @keyframes scaleUp {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="background" id="background"></div>
+
+    <div class="calculator">
+        <input type="text" id="display" class="display" disabled />
+        <div class="buttons">
+            <button class="button number" onclick="appendNumber('7')">7</button>
+            <button class="button number" onclick="appendNumber('8')">8</button>
+            <button class="button number" onclick="appendNumber('9')">9</button>
+            <button class="button operator" onclick="setOperator('/')">÷</button>
+
+            <button class="button number" onclick="appendNumber('4')">4</button>
+            <button class="button number" onclick="appendNumber('5')">5</button>
+            <button class="button number" onclick="appendNumber('6')">6</button>
+            <button class="button operator" onclick="setOperator('*')">×</button>
+
+            <button class="button number" onclick="appendNumber('1')">1</button>
+            <button class="button number" onclick="appendNumber('2')">2</button>
+            <button class="button number" onclick="appendNumber('3')">3</button>
+            <button class="button operator" onclick="setOperator('-')">−</button>
+
+            <button class="button number" onclick="appendNumber('0')">0</button>
+            <button class="button clear" onclick="clearDisplay()">C</button>
+            <button class="button equal" onclick="calculate()">=</button>
+            <button class="button operator" onclick="setOperator('+')">+</button>
+        </div>
+    </div>
+
+    <script>
+        let currentInput = "";
+        let previousInput = "";
+        let operator = "";
+
+        function appendNumber(number) {
+            currentInput += number;
+            updateDisplay();
+        }
+
+        function setOperator(op) {
+            if (currentInput === "") return;
+            if (previousInput !== "") {
+                calculate();
+            }
+            operator = op;
+            previousInput = currentInput;
+            currentInput = "";
+        }
+
+        function calculate() {
+            if (previousInput === "" || currentInput === "") return;
+            let result;
+            const prev = parseFloat(previousInput);
+            const curr = parseFloat(currentInput);
+
+            switch (operator) {
+                case "+":
+                    result = prev + curr;
+                    break;
+                case "-":
+                    result = prev - curr;
+                    break;
+                case "*":
+                    result = prev * curr;
+                    break;
+                case "/":
+                    result = curr !== 0 ? prev / curr : "Error";
+                    break;
+                default:
+                    return;
+            }
+
+            currentInput = result.toString();
+            operator = "";
+            previousInput = "";
+            updateDisplay();
+        }
+
+        function clearDisplay() {
+            currentInput = "";
+            previousInput = "";
+            operator = "";
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            const display = document.getElementById("display");
+            display.value = currentInput;
+        }
+
+        // Create larger floating circles and particles in the background
+        function createFloatingEffects() {
+            const background = document.getElementById("background");
+
+            // Floating circles (larger)
+            for (let i = 0; i < 10; i++) {
+                const circle = document.createElement("div");
+                circle.classList.add("circle");
+                circle.style.width = `${Math.random() * 150 + 50}px`;  // Increased size
+                circle.style.height = circle.style.width;
+                circle.style.top = `${Math.random() * 100}vh`;
+                circle.style.left = `${Math.random() * 100}vw`;
+                circle.style.animationDuration = `${Math.random() * 6 + 6}s`;  // Slower floating speed
+                circle.style.animationDelay = `${Math.random() * 5}s`;
+                background.appendChild(circle);
+            }
+
+            // Animated particles
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement("div");
+                particle.classList.add("particle");
+                particle.style.width = `${Math.random() * 20 + 10}px`;
+                particle.style.height = particle.style.width;
+                particle.style.top = `${Math.random() * 100}vh`;
+                particle.style.left = `${Math.random() * 100}vw`;
+                particle.style.animationDuration = `${Math.random() * 5 + 2}s`;
+                background.appendChild(particle);
+            }
+        }
+
+        // Initialize background effects
+        createFloatingEffects();
+    </script>
+</body>
+</html>

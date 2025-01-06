@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Game</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(45deg, #ff7e5f, #feb47b);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #fff;
+            flex-direction: column;
+        }
+
+        .difficulty-selector {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #ff5722;
+            border: none;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+            color: white;
+        }
+
+        button:hover {
+            background-color: #ff7043;
+        }
+
+        button:active {
+            background-color: #ff3d00;
+        }
+
+        .game-container {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .card {
+            width: 100px;
+            height: 100px;
+            background-color: #4CAF50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .flipped {
+            background-color: white;
+            transform: rotateY(180deg);
+        }
+
+        .hidden {
+            visibility: hidden;
+        }
+
+        .card .card-front,
+        .card .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+        }
+
+        .card .card-front {
+            background-color: #4CAF50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .card .card-back {
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: #4CAF50;
+            transform: rotateY(180deg);
+        }
+
+        .flipped .card-back {
+            transform: rotateY(0deg);
+        }
+
+        .flipped .card-front {
+            transform: rotateY(-180deg);
+        }
+
+        .timer {
+            font-size: 20px;
+            margin-top: 20px;
+            text-align: center;
+            color: #fff;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="difficulty-selector">
+    <button onclick="setDifficulty(4)">Easy</button>
+    <button onclick="setDifficulty(6)">Medium</button>
+    <button onclick="setDifficulty(8)">Hard</button>
+</div>
+
+<div class="game-container" id="gameContainer"></div>
+<div class="timer" id="gameTimer">Time: 00:00</div>
+
+<script>
+    let difficulty = 4; // Default: Easy (4 pairs)
+    let cards = [];
+    let flippedCards = [];
+    let matchedCards = 0;
+    let timerInterval;
+    let timerSeconds = 0;
+    const gameContainer = document.getElementById("gameContainer");
+    const timerDisplay = document.getElementById("gameTimer");
+
+    // Difficulty Level Setup
+    function setDifficulty(level) {
+        difficulty = level;
+        startGame();
+    }
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function startGame() {
+        cards = [];
+        matchedCards = 0;
+        timerSeconds = 0;
+        clearInterval(timerInterval);
+        timerInterval = setInterval(updateTimer, 1000);
+
+        gameContainer.innerHTML = "";
+        const totalCards = difficulty * 2;
+        const symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+        const selectedSymbols = symbols.slice(0, difficulty);
+
+        // Create the deck of cards
+        let deck = [...selectedSymbols, ...selectedSymbols];
+        shuffle(deck);
+
+        deck.forEach((symbol, index) => {
+            const card = document.createElement("div");
+            card.classList.add("card");
+            card.setAttribute("data-symbol", symbol);
+            card.setAttribute("data-index", index);
+
+            // Front and back of the card
+            const front = document.createElement("div");
+            front.classList.add("card-front");
+            front.textContent = "?";
+
+            const back = document.createElement("div");
+            back.classList.add("card-back");
+            back.textContent = symbol;
+
+            card.appendChild(front);
+            card.appendChild(back);
+
+            card.addEventListener("click", flipCard);
+            gameContainer.appendChild(card);
+        });
+    }
+
+    function flipCard() {
+        if (flippedCards.length === 2) return;
+
+        const card = this;
+        if (flippedCards.includes(card) || card.classList.contains("flipped")) return;
+
+        card.classList.add("flipped");
+        flippedCards.push(card);
+
+        if (flippedCards.length === 2) {
+            checkMatch();
+        }
+    }
+
+    function checkMatch() {
+        const [firstCard, secondCard] = flippedCards;
+        if (firstCard.getAttribute("data-symbol") === secondCard.getAttribute("data-symbol")) {
+            matchedCards += 2;
+            flippedCards = [];
+            if (matchedCards === difficulty * 2) {
+                clearInterval(timerInterval);
+                alert("You win!");
+            }
+        } else {
+            setTimeout(() => {
+                firstCard.classList.remove("flipped");
+                secondCard.classList.remove("flipped");
+                flippedCards = [];
+            }, 1000);
+        }
+    }
+
+    function updateTimer() {
+        timerSeconds++;
+        const minutes = Math.floor(timerSeconds / 60);
+        const seconds = timerSeconds % 60;
+        timerDisplay.textContent = `Time: ${formatTime(minutes)}:${formatTime(seconds)}`;
+    }
+
+    function formatTime(time) {
+        return time < 10 ? `0${time}` : time;
+    }
+
+    startGame();
+</script>
+
+</body>
+</html>

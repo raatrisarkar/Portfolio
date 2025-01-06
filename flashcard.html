@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcards</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+        }
+
+        .flashcard-container {
+            text-align: center;
+            background-color: #fff;
+            border-radius: 10px;
+            width: 300px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .flashcard {
+            background-color: #4CAF50;
+            color: white;
+            padding: 40px;
+            border-radius: 10px;
+            font-size: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            transform: perspective(600px) rotateY(0deg);
+        }
+
+        .flashcard:hover {
+            background-color: #45a049;
+            transform: perspective(600px) rotateY(10deg);
+        }
+
+        .flashcard-definition {
+            background-color: #ff5722;
+            color: white;
+            padding: 40px;
+            border-radius: 10px;
+            font-size: 24px;
+            text-align: center;
+            display: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            transform: perspective(600px) rotateY(180deg);
+        }
+
+        .buttons {
+            margin-top: 20px;
+        }
+
+        .button {
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+
+        .button:active {
+            background-color: #3e8e41;
+            transform: scale(0.98);
+        }
+
+        #score {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="flashcard-container">
+        <div id="flashcard" class="flashcard" onclick="flipCard()">
+            Click to Flip
+        </div>
+
+        <div id="flashcardDefinition" class="flashcard-definition">
+            Definition will go here.
+        </div>
+
+        <div class="buttons">
+            <button id="prevButton" class="button" onclick="prevCard()">Previous</button>
+            <button id="nextButton" class="button" onclick="nextCard()">Next</button>
+        </div>
+
+        <div id="score">Flashcard 1 of 5</div>
+    </div>
+
+    <script>
+        // Flashcard data
+        const flashcards = [
+            { term: "HTML", definition: "HyperText Markup Language, used for structuring web pages." },
+            { term: "CSS", definition: "Cascading Style Sheets, used for styling web pages." },
+            { term: "JavaScript", definition: "A programming language used to create interactive effects within web browsers." },
+            { term: "Python", definition: "A programming language known for its readability and versatility." },
+            { term: "React", definition: "A JavaScript library for building user interfaces." }
+        ];
+
+        let currentCardIndex = 0;
+
+        // Initialize the first flashcard
+        displayFlashcard();
+
+        // Display the current flashcard
+        function displayFlashcard() {
+            const flashcardElement = document.getElementById("flashcard");
+            const definitionElement = document.getElementById("flashcardDefinition");
+            const scoreElement = document.getElementById("score");
+
+            flashcardElement.textContent = flashcards[currentCardIndex].term;
+            definitionElement.textContent = flashcards[currentCardIndex].definition;
+            scoreElement.textContent = `Flashcard ${currentCardIndex + 1} of ${flashcards.length}`;
+        }
+
+        // Flip the card
+        function flipCard() {
+            const flashcardElement = document.getElementById("flashcard");
+            const definitionElement = document.getElementById("flashcardDefinition");
+
+            if (flashcardElement.style.display !== "none") {
+                flashcardElement.style.display = "none";
+                definitionElement.style.display = "block";
+            } else {
+                flashcardElement.style.display = "block";
+                definitionElement.style.display = "none";
+            }
+        }
+
+        // Go to the next flashcard
+        function nextCard() {
+            if (currentCardIndex < flashcards.length - 1) {
+                currentCardIndex++;
+                displayFlashcard();
+                resetCardFlip();
+            }
+        }
+
+        // Go to the previous flashcard
+        function prevCard() {
+            if (currentCardIndex > 0) {
+                currentCardIndex--;
+                displayFlashcard();
+                resetCardFlip();
+            }
+        }
+
+        // Reset the flip state (back to term)
+        function resetCardFlip() {
+            document.getElementById("flashcard").style.display = "block";
+            document.getElementById("flashcardDefinition").style.display = "none";
+        }
+    </script>
+
+</body>
+</html>
